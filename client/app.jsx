@@ -8,11 +8,23 @@ import ImagesContainer from './savedImagesContainer.js';
 class App extends Component{
    constructor(props){
       super(props);
-      this.state = {};
+      this.state = {
+         images: []
+      };
 
       this.handleDownload = this.handleDownload.bind(this);
       this.handleSave = this.handleSave.bind(this);
    }
+   
+   componentDidMount() {
+      fetch('/getImages')
+        .then (res => res.json())
+        .then (data => {
+         this.setState({images: data});
+        // console.log('data from database:', data)
+        });
+      }
+    
 
    handleDownload (){
       let canvas = document.getElementById("canvas");
@@ -25,25 +37,34 @@ class App extends Component{
    }
 
    handleSave (){
-      let canvas = document.getElementById("canvas");
-      let dataURL = canvas.toDataURL("image/png", 1.0);
+      const imageData = {
+         color: "grey",
+         character: "astronaut",
+         item: "waves"
+      }
 
-      console.log("save is clicked")
-  
       fetch('/uploadToDB', {
          method: 'POST',
-         body: JSON.stringify({
-            image: dataURL
+         headers: {'Content-Type': 'application/json'},
+         body: JSON.stringify(imageData),
          })
-      })
-   }
+         .then(response => response.text())
+         .then (data => {
+            alert('Successfuly Saved', data)
+         })
+         .catch ((error) => {
+            alert("Error with saving")
+         })
+      }
+
 
    render(){
+      // console.log(this.state)
       return(
          <div>
             <h1>NFT GENERATOR</h1>
             <div className="canvasContainer">
-                <ImagesContainer/><NftCanvas/> <DropdownButtons/>
+              { this.state.images.length > 0 && <ImagesContainer imageData = {this.state.images}/> }<NftCanvas/> <DropdownButtons/>
             </div>
             <div className="buttonSection">
             <button onClick={this.handleDownload} id="downloadButton"> DOWNLOAD </button>

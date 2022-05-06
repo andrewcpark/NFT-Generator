@@ -3,26 +3,29 @@ const PORT = process.env.PORT || 3010;
 const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
+const imageController = require('../server/imageController.js')
 
-const databaseURL="mongodb+srv://andrewcpark:chanwon123@cluster0.olcmu.mongodb.net/nftImages?retryWrites=true&w=majority"
+app.use(express.json());
+app.use(require("body-parser").json())
 
-mongoose.connect(databaseURL, {useNewUrlParser: true});
-const db = mongoose.connection;
+app.post('/uploadToDB', 
+    imageController.addImages,
+    (req, res) => res.send(200)
+);
 
-db.on('error', (error) => console.error(error));
-db.once('open', () => console.log('Connected to Database'));
-
-
-app.use(express.static(__dirname + '/../bundle'));
-
+app.get('/getImages',
+imageController.getImages,
+  (req, res) => res.status(200).json(res.locals.imageData)
+// (req, res) => res.status(200).json([{images: "testing"}])
+);
 app.get('/', (req, res) => {
     res.status(200).sendFile(path.join(__dirname + '/../bundle/index.html'));
+    // res.status(200).sendFile(path.resolve(__dirname + '/../index.html'));
 });
 
+app.use(express.static(__dirname + '/../bundle'));
+// app.use(express.static(path.resolve(__dirname + '/../client')));
 
-app.post("/uploadToDB", (req, res) => {
-    console.log(req.body.image);
-})
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

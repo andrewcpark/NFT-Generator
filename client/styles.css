@@ -33,6 +33,12 @@ h1{
   justify-content: center;
 }
 
+.imagesData{
+  text-align: center;
+  color: white;
+  font-family: Roboto;
+}
+
 .imagesContainer{
   border: 1px solid white;
   width: 300px;
